@@ -1,9 +1,10 @@
+
 CREATE TABLE users(
  userID int NOT NULL AUTO_INCREMENT,
  userName varchar(255) UNIQUE NOT NULL,
  securedPassword varchar(255) NOT NULL,
  
- PRIMARY KEY(user_ID)
+ PRIMARY KEY(userID)
 );
 
 CREATE TABLE night_records(
@@ -45,17 +46,21 @@ FOREIGN KEY(userID) REFERENCES users(userID)
 );
 
 
-CREATE TABLE userBio(
+CREATE TABLE user_bio(
 
 bioID INT NOT NULL AUTO_INCREMENT,
 userID INT NOT NULL,
+
+age INT NOT NULL,
 height INT NOT NULL,
+weight INT NOT NULL,
+gender ENUM('M', 'F', 'Other'),
 
 
 PRIMARY KEY(bioID),
 
-CONSTRAINT fk_events_userID
-FOREIGN KEY(morningID) REFERENCES users(morningID)
+CONSTRAINT fk_bio_userID
+FOREIGN KEY(userID) REFERENCES users(userID)
 );
 
 CREATE TABLE schedule_events(
@@ -103,7 +108,7 @@ auditDate datetime,
 PRIMARY KEY(auditID),
 
 CONSTRAINT fk_night_audit
-FOREIGN KEY(nightID) REFERENCES users(nightID)
+FOREIGN KEY(nightID) REFERENCES night_records(nightID)
 );
 
 CREATE TABLE morning_records_audit(
@@ -127,7 +132,7 @@ auditDate datetime,
 PRIMARY KEY(auditID),
 
 CONSTRAINT fk_morning_audit
-FOREIGN KEY(userID) REFERENCES users(userID)
+FOREIGN KEY(userID) REFERENCES morning_records(userID)
 );
 
 CREATE TABLE schedule_events_audit(
@@ -148,5 +153,7 @@ oldInstanceType ENUM('Single', 'Routine'),
 PRIMARY KEY(auditID),
 
 CONSTRAINT fk_events_audit
-FOREIGN KEY(eventID) REFERENCES users(eventID)
+FOREIGN KEY(eventID) REFERENCES schedule_events(eventID)
 );
+
+drop table userbio;
