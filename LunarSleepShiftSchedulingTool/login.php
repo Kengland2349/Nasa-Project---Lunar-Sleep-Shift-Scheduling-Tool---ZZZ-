@@ -1,12 +1,11 @@
 <?php
     
-    /* -- testing some stuff
+    // testing some stuff
     function refreshMessage($text) {
         $_SESSION['message'] = "$text";
         header("Location: index.php");
         exit;
     }
-    */
     
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
@@ -34,19 +33,13 @@
                     
                     $_SESSION['user_ID'] = $user['user_ID'];
                     
-                    echo "Login successful!";
-                    header("Location: index.php");
-                    exit;
+                    refreshMessage("Login successful!");
                 } else {
-                    $_SESSION['message'] = "Invalid username or password.";
-                    header("Location: index.php");
-                    exit;
+                    refreshMessage("Invalid username or password.");
                 }
                 
             } else {
-                $_SESSION['message'] = "Invalid username or password.";
-                header("Location: index.php");
-                exit;
+                refreshMessage("Invalid username or password.");
             }
         }
         else if ($formType === 'register') {
@@ -62,24 +55,22 @@
             $user = $stmt->fetch();
             
             if ($user) {
-                $_SESSION['message'] = "Username is already in use!";
-                header("Location: index.php");
-                exit;
+                refreshMessage("Username is already in use!");
             } else {
                 $username = $_POST['username'] ?? '';
                 $password = $_POST['password'] ?? '';
+                
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 
                 $stmt = $pdo->prepare(
                     "INSERT INTO users (user_Name, secured_Password)
                      VALUES (?, ?)"
                     );
                 
-                $stmt->execute([$username, $password]);
+                $stmt->execute([$username, $hashedPassword]);
                 $result = $stmt->fetch();
                 
-                $_SESSION['message'] = "$username is registered!";
-                header("Location: index.php");
-                exit;
+                refreshMessage("$username is registered!");
             
             }
         }
