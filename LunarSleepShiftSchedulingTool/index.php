@@ -3,19 +3,32 @@
     
     include 'connection.php';
     
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
-        
-        $_SESSION = [];
-        session_destroy();
-        
-        header('Location: index.php');
-        exit;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $formType = $_POST['form_type'] ?? '';
+        if ($formType == 'logout') {
+            $_SESSION = [];
+            session_destroy();
+            
+            header('Location: index.php');
+            exit;
+        }
     }
+    
     
     include 'header.php';
     
     if (!isset($_SESSION['user_ID'])) {
-        include 'login.php';
+        if (isset($_SESSION['portalPage'])) {
+            if ($_SESSION['portalPage'] == 'login') {
+                include 'login.php';
+            }
+            else if ($_SESSION['portalPage'] == 'signUp') {
+                include 'signUp.php';
+            }
+        }
+        else {
+            include 'portal.php';
+        }
     } else {
         include 'mainPage.php';
     }

@@ -12,7 +12,7 @@
 
         <style>
             body {
-                
+                background-color: white;
             }
             p {
                 

@@ -7,6 +7,9 @@
 			<p>Rylan Peets-Cheek</p>
 			<p>Hailey Swain</p>
 			
-			links, copyright, contact information including mailing and phone and last updated</footer>
+			<!-- links, copyright, contact information including mailing and phone and last updated -->
+			
+			
+			</footer>
     </body>
 </html>
