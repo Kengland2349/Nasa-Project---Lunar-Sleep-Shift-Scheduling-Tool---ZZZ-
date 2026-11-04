@@ -1,72 +1,100 @@
 
+-- create the database
+DROP DATABASE IF EXISTS sleepyNASA;
+CREATE DATABASE sleepyNASA;
+
+-- select the database
+USE sleepyNASA;
+
+-- clean
 CREATE TABLE users(
- userID int NOT NULL AUTO_INCREMENT,
- userName varchar(255) UNIQUE NOT NULL,
- securedPassword varchar(255) NOT NULL,
+ user_id int NOT NULL AUTO_INCREMENT,
+ user_name varchar(255) UNIQUE NOT NULL,
+ email varchar(255) UNIQUE NOT NULL,
+ secured_password varchar(64) NOT NULL,
  
  PRIMARY KEY(userID)
 );
 
-CREATE TABLE night_records(
-nightID int NOT NULL AUTO_INCREMENT,
-userID INT,
+/*
+behavior_id
+log_id
+fatigue_score
+alertness_score
+caffeine_cups
+melatonin_mg
+last_meal_hrs
+exercise_mins
+exercise_intensity
+*/
+CREATE TABLE pre_sleep_behaviors ( 
+behavior_id INT AUTO_INCREMENT PRIMARY KEY,
+log_id INT NOT NULL,
+fatigue_score TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
+alertness_score TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
+caffeine_cups TINYINT DEFAULT 0,
+melatonin_mg DECIMAL(4,2) DEFAULT 0.0,
+last_meal_hrs DECIMAL(4,1) NOT NULL,
+exercise_mins SMALLINT DEFAULT 0,
+exercise_intensity TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
 
-fatigueLevel INT NOT NULL,
-alertLevel INT NOT NULL,
-mealTime time NOT NULL,
-caffieneTime time NOT NULL,
-melatoninCount INT NOT NULL,
-sleepCount INT NOT NULL,
-excerciseTime time,
-exerciseIntensity INT,
-recordDate datetime NOT NULL,
+FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE, 
+UNIQUE KEY uq_user_date (user_id, log_date) 
+) 
+ENGINE=InnoDB;
+
+/*
+log_id
+user_id
+bed_time
+wake_time
+latency_mins
+awakenings_count
+rating_1_10
+*/
+CREATE TABLE daily_sleep_logs ( 
+log_id INT AUTO_INCREMENT PRIMARY KEY, 
+user_id INT NOT NULL, 
+log_date DATE NOT NULL,
+bed_time DATETIME NOT NULL, 
+wake_time DATETIME NOT NULL,
+latency_mins SMALLINT DEFAULT 0, 
+awakenings_count TINYINT DEFAULT 0, 
+awakenings_avg_mins SMALLINT DEFAULT 0, 
+rating_1_10 TINYINT CHECK (rating_1_10 BETWEEN 1 AND 10), 
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE, 
+UNIQUE KEY uq_user_date (user_id, log_date) 
+) 
+ENGINE=InnoDB;
 
 
-PRIMARY KEY(nightID),
+CREATE TABLE biometric_profiles ( 
 
-CONSTRAINT fk_night_userID
-FOREIGN KEY(userID) REFERENCES users(userID)
-);
+profile_id INT AUTO_INCREMENT PRIMARY KEY, 
+user_id INT NOT NULL UNIQUE, 
 
-CREATE TABLE morning_records(
-morningID INT NOT NULL AUTO_INCREMENT,
-userID INT,
+age TINYINT NOT NULL CHECK (age BETWEEN 10 AND 120), 
+gender ENUM('Male', 'Female') NOT NULL, 
+height_cm DECIMAL(5,2) NOT NULL,
+weight_kg DECIMAL(5,2) NOT NULL, 
 
-wakeTime time NOT NULL,
-sleepDelay INT NOT NULL,
-awakenCount INT NOT NULL,
-awakenTime INT NOT NULL,
-qualityLevel INT NOT NULL,
-recordDate datetime NOT NULL,
+FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+)
+ENGINE=InnoDB; 
 
-PRIMARY KEY(morningID),
-
-CONSTRAINT fk_morning_userID
-FOREIGN KEY(userID) REFERENCES users(userID)
-);
-
-
-CREATE TABLE user_bio(
-
-bioID INT NOT NULL AUTO_INCREMENT,
-userID INT NOT NULL,
-
-age INT NOT NULL,
-height INT NOT NULL,
-weight INT NOT NULL,
-gender ENUM('M', 'F', 'Other'),
-
-
-PRIMARY KEY(bioID),
-
-CONSTRAINT fk_bio_userID
-FOREIGN KEY(userID) REFERENCES users(userID)
-);
-
+/*
+schedule_id
+user_id
+busy_start
+busy_end
+event_label
+*/
 CREATE TABLE schedule_events(
 
 eventID INT NOT NULL AUTO_INCREMENT,
-userID INT NOT NULL,
+user_id INT NOT NULL,
 eventName varchar(255) NOT NULL,
 startTime time NOT NULL,
 endTime time NOT NULL,
@@ -75,9 +103,18 @@ instanceType ENUM('Single', 'Routine'),
 PRIMARY KEY(eventID),
 
 CONSTRAINT fk_events_user
-FOREIGN KEY(userID) REFERENCES users(userID)
+FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
+CREATE TABLE missed_events(
+
+event_id INT NOT NULL AUTO_INCREMENT,
+user_id int,
+planned_time DATETIME,
+arrival_time DATETIME,
+
+FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 
 -- Audit tables
 
@@ -132,7 +169,7 @@ auditDate datetime,
 PRIMARY KEY(auditID),
 
 CONSTRAINT fk_morning_audit
-FOREIGN KEY(userID) REFERENCES morning_records(userID)
+FOREIGN KEY(morningID) REFERENCES morning_records(morningID)
 );
 
 CREATE TABLE schedule_events_audit(
@@ -155,5 +192,3 @@ PRIMARY KEY(auditID),
 CONSTRAINT fk_events_audit
 FOREIGN KEY(eventID) REFERENCES schedule_events(eventID)
 );
-
-drop table userbio;
