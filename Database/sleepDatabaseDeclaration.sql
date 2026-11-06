@@ -15,6 +15,7 @@ CREATE TABLE users(
  
  PRIMARY KEY(userID)
 );
+CREATE INDEX idx_user_user_name ON users(user_name);
 
 /*
 behavior_id
@@ -30,8 +31,8 @@ exercise_intensity
 CREATE TABLE pre_sleep_behaviors ( 
 behavior_id INT AUTO_INCREMENT PRIMARY KEY,
 log_id INT NOT NULL,
-fatigue_score TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
-alertness_score TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
+fatigue_score TINYINT CHECK (fatigue_score BETWEEN 0 AND 10),
+alertness_score TINYINT CHECK (alertness_score BETWEEN 0 AND 10),
 caffeine_cups TINYINT DEFAULT 0,
 melatonin_mg DECIMAL(4,2) DEFAULT 0.0,
 last_meal_hrs DECIMAL(4,1) NOT NULL,
@@ -95,15 +96,14 @@ CREATE TABLE schedule_events(
 
 eventID INT NOT NULL AUTO_INCREMENT,
 user_id INT NOT NULL,
-eventName varchar(255) NOT NULL,
-startTime time NOT NULL,
-endTime time NOT NULL,
-instanceType ENUM('Single', 'Routine'),
+event_name varchar(255) ,
+start_time time NOT NULL,
+end_time time NOT NULL,
+instance_type ENUM('Single', 'Routine'),
 
 PRIMARY KEY(eventID),
 
-CONSTRAINT fk_events_user
-FOREIGN KEY(user_id) REFERENCES users(user_id)
+FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE missed_events(
