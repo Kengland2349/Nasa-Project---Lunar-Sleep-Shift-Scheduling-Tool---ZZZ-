@@ -10,7 +10,6 @@ USE sleepyNASA;
 CREATE TABLE users(
  user_id int NOT NULL AUTO_INCREMENT,
  user_name varchar(255) UNIQUE NOT NULL,
- email varchar(255) UNIQUE NOT NULL,
  secured_password varchar(64) NOT NULL,
  
  PRIMARY KEY(userID)
@@ -56,12 +55,11 @@ rating_1_10
 CREATE TABLE daily_sleep_logs ( 
 log_id INT AUTO_INCREMENT PRIMARY KEY, 
 user_id INT NOT NULL, 
-log_date DATE NOT NULL,
+log_date DATE NOT NULL UNIQUE,
 bed_time DATETIME NOT NULL, 
 wake_time DATETIME NOT NULL,
 latency_mins SMALLINT DEFAULT 0, 
 awakenings_count TINYINT DEFAULT 0, 
-awakenings_avg_mins SMALLINT DEFAULT 0, 
 rating_1_10 TINYINT CHECK (rating_1_10 BETWEEN 1 AND 10), 
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
@@ -118,59 +116,43 @@ FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 
 -- Audit tables
 
-CREATE TABLE night_records_audit(
+CREATE TABLE pre_sleep_behaviors_audit ( 
+behavior_id INT AUTO_INCREMENT PRIMARY KEY,
+log_id INT NOT NULL,
+fatigue_score TINYINT CHECK (fatigue_score BETWEEN 0 AND 10),
+alertness_score TINYINT CHECK (alertness_score BETWEEN 0 AND 10),
+caffeine_cups TINYINT DEFAULT 0,
+melatonin_mg DECIMAL(4,2) DEFAULT 0.0,
+last_meal_hrs DECIMAL(4,1) NOT NULL,
+exercise_mins SMALLINT DEFAULT 0,
+exercise_intensity TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
 
-auditID INT NOT NULL AUTO_INCREMENT,
-auditType varchar(8) NOT NULL,
-nightID int NOT NULL,
+FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE, 
+UNIQUE KEY uq_user_date (user_id, log_date) 
+) 
+ENGINE=InnoDB;
 
-newFatigueLevel INT,
-oldFatigueLevel INT,
-newAlertLevel INT,
-oldAlertLevel INT,
-newMealTime time,
-oldMealTime time,
-newCaffieneTime time,
-oldCaffieneTime time,
-newMelatoninCount INT,
-oldMelatoninCount INT,
-newSleepCount INT,
-oldSleepCount INT,
-newExcerciseTime time,
-oldExcerciseTime time,
-newExerciseIntensity INT,
-oldExerciseIntensity INT,
-auditDate datetime,
+CREATE TABLE daily_sleep_logs_audit ( 
 
-PRIMARY KEY(auditID),
+log_audit_id INT AUTO_INCREMENT PRIMARY KEY,
+log_audit_type ENUM("Insert", "Update"),
+log_id INT, 
+log_date DATE NOT NULL UNIQUE,
+old_bed_time DATETIME NOT NULL, 
+new_bed_time DATETIME, 
+old_wake_time DATETIME NOT NULL,
+new_wake_time DATETIME,
+old_latency_mins SMALLINT, 
+new_latency_mins SMALLINT, 
+old_awakenings_count TINYINT, 
+new_awakenings_count TINYINT, 
+old_rating_1_10 TINYINT CHECK (rating_1_10 BETWEEN 1 AND 10), 
+new_rating_1_10 TINYINT CHECK (rating_1_10 BETWEEN 1 AND 10), 
+created_at TIMESTAMP,
 
-CONSTRAINT fk_night_audit
-FOREIGN KEY(nightID) REFERENCES night_records(nightID)
-);
-
-CREATE TABLE morning_records_audit(
-
-auditID INT NOT NULL AUTO_INCREMENT,
-auditType varchar(8) NOT NULL,
-morningID INT NOT NULL,
-
-newWakeTime time,
-oldWakeTime time,
-newSleepDelay INT,
-oldSleepDelay INT,
-newAwakenCount INT,
-oldAwakenCount INT,
-newAwakenTime INT,
-oldAwakenTime INT,
-newQualityLevel INT,
-oldQualityLevel INT,
-auditDate datetime,
-
-PRIMARY KEY(auditID),
-
-CONSTRAINT fk_morning_audit
-FOREIGN KEY(morningID) REFERENCES morning_records(morningID)
-);
+FOREIGN KEY (log_id) REFERENCES daily_sleep_logs(log_id)
+) 
+ENGINE=InnoDB;
 
 CREATE TABLE schedule_events_audit(
 
