@@ -12,7 +12,7 @@ CREATE TABLE users(
  user_name varchar(255) UNIQUE NOT NULL,
  secured_password varchar(64) NOT NULL,
  
- PRIMARY KEY(userID)
+ PRIMARY KEY(user_id)
 );
 CREATE INDEX idx_user_user_name ON users(user_name);
 
@@ -30,6 +30,7 @@ exercise_intensity
 CREATE TABLE pre_sleep_behaviors ( 
 behavior_id INT AUTO_INCREMENT PRIMARY KEY,
 log_id INT NOT NULL,
+user_id INT,
 fatigue_score TINYINT CHECK (fatigue_score BETWEEN 0 AND 10),
 alertness_score TINYINT CHECK (alertness_score BETWEEN 0 AND 10),
 caffeine_cups TINYINT DEFAULT 0,
@@ -38,8 +39,7 @@ last_meal_hrs DECIMAL(4,1) NOT NULL,
 exercise_mins SMALLINT DEFAULT 0,
 exercise_intensity TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
 
-FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE, 
-UNIQUE KEY uq_user_date (user_id, log_date) 
+FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) 
 ENGINE=InnoDB;
 
@@ -106,7 +106,7 @@ FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 
 CREATE TABLE missed_events(
 
-event_id INT NOT NULL AUTO_INCREMENT,
+event_id INT AUTO_INCREMENT PRIMARY KEY,
 user_id int,
 planned_time DATETIME,
 arrival_time DATETIME,
@@ -119,6 +119,7 @@ FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 CREATE TABLE pre_sleep_behaviors_audit ( 
 behavior_id INT AUTO_INCREMENT PRIMARY KEY,
 log_id INT NOT NULL,
+user_id INT,
 fatigue_score TINYINT CHECK (fatigue_score BETWEEN 0 AND 10),
 alertness_score TINYINT CHECK (alertness_score BETWEEN 0 AND 10),
 caffeine_cups TINYINT DEFAULT 0,
@@ -127,8 +128,7 @@ last_meal_hrs DECIMAL(4,1) NOT NULL,
 exercise_mins SMALLINT DEFAULT 0,
 exercise_intensity TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
 
-FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE, 
-UNIQUE KEY uq_user_date (user_id, log_date) 
+FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) 
 ENGINE=InnoDB;
 
@@ -146,8 +146,8 @@ old_latency_mins SMALLINT,
 new_latency_mins SMALLINT, 
 old_awakenings_count TINYINT, 
 new_awakenings_count TINYINT, 
-old_rating_1_10 TINYINT CHECK (rating_1_10 BETWEEN 1 AND 10), 
-new_rating_1_10 TINYINT CHECK (rating_1_10 BETWEEN 1 AND 10), 
+old_rating_1_10 TINYINT, 
+new_rating_1_10 TINYINT, 
 created_at TIMESTAMP,
 
 FOREIGN KEY (log_id) REFERENCES daily_sleep_logs(log_id)
@@ -174,3 +174,4 @@ PRIMARY KEY(auditID),
 CONSTRAINT fk_events_audit
 FOREIGN KEY(eventID) REFERENCES schedule_events(eventID)
 );
+
