@@ -16,42 +16,24 @@ CREATE TABLE users(
 );
 CREATE INDEX idx_user_user_name ON users(user_name);
 
-/*
-behavior_id
-log_id
-fatigue_score
-alertness_score
-caffeine_cups
-melatonin_mg
-last_meal_hrs
-exercise_mins
-exercise_intensity
-*/
+
 CREATE TABLE pre_sleep_behaviors ( 
 behavior_id INT AUTO_INCREMENT PRIMARY KEY,
 log_id INT NOT NULL,
-user_id INT,
 fatigue_score TINYINT CHECK (fatigue_score BETWEEN 0 AND 10),
 alertness_score TINYINT CHECK (alertness_score BETWEEN 0 AND 10),
 caffeine_cups TINYINT DEFAULT 0,
 melatonin_mg DECIMAL(4,2) DEFAULT 0.0,
 last_meal_hrs DECIMAL(4,1) NOT NULL,
+last_meal_size INT CHECK (last_meal_size BETWEEN 1 AND 5),
 exercise_mins SMALLINT DEFAULT 0,
 exercise_intensity TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
 
-FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+FOREIGN KEY (log_id) REFERENCES daily_sleep_logs(log_id) ON DELETE CASCADE
 ) 
 ENGINE=InnoDB;
 
-/*
-log_id
-user_id
-bed_time
-wake_time
-latency_mins
-awakenings_count
-rating_1_10
-*/
+
 CREATE TABLE daily_sleep_logs ( 
 log_id INT AUTO_INCREMENT PRIMARY KEY, 
 user_id INT NOT NULL, 
@@ -60,6 +42,7 @@ bed_time DATETIME NOT NULL,
 wake_time DATETIME NOT NULL,
 latency_mins SMALLINT DEFAULT 0, 
 awakenings_count TINYINT DEFAULT 0, 
+awakening_latency_mins SMALLINT DEFAULT 0,
 rating_1_10 TINYINT CHECK (rating_1_10 BETWEEN 1 AND 10), 
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
@@ -117,25 +100,37 @@ FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 -- Audit tables
 
 CREATE TABLE pre_sleep_behaviors_audit ( 
-behavior_id INT AUTO_INCREMENT PRIMARY KEY,
-log_id INT NOT NULL,
-user_id INT,
-fatigue_score TINYINT CHECK (fatigue_score BETWEEN 0 AND 10),
-alertness_score TINYINT CHECK (alertness_score BETWEEN 0 AND 10),
-caffeine_cups TINYINT DEFAULT 0,
-melatonin_mg DECIMAL(4,2) DEFAULT 0.0,
-last_meal_hrs DECIMAL(4,1) NOT NULL,
-exercise_mins SMALLINT DEFAULT 0,
-exercise_intensity TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
 
-FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+pre_sleep_audit_id INT AUTO_INCREMENT PRIMARY KEY,
+pre_sleep_audit_type ENUM("Insert", "Update", "Delete") NOT NULL,
+behavior_id INT NOT NULL,
+
+old_fatigue_score TINYINT,
+new_fatigue_score TINYINT,
+old_alertness_score TINYINT,
+new_alertness_score TINYINT,
+old_caffeine_cups TINYINT,
+new_caffeine_cups TINYINT,
+old_melatonin_mg DECIMAL(4,2),
+new_melatonin_mg DECIMAL(4,2),
+old_last_meal_hrs DECIMAL(4,1),
+new_last_meal_hrs DECIMAL(4,1),
+old_last_meal_size INT,
+new_last_meal_size INT,
+old_exercise_mins SMALLINT,
+new_exercise_mins SMALLINT,
+old_exercise_intensity TINYINT,
+new_exercise_intensity TINYINT,
+
+FOREIGN KEY (behavior_id) REFERENCES pre_sleep_behaviors(behavior_id)
 ) 
 ENGINE=InnoDB;
+
 
 CREATE TABLE daily_sleep_logs_audit ( 
 
 log_audit_id INT AUTO_INCREMENT PRIMARY KEY,
-log_audit_type ENUM("Insert", "Update"),
+log_audit_type ENUM("Insert", "Update", "Delete") NOT NULL,
 log_id INT, 
 log_date DATE NOT NULL UNIQUE,
 old_bed_time DATETIME NOT NULL, 
