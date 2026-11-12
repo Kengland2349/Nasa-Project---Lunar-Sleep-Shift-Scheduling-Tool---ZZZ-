@@ -1,13 +1,42 @@
-DROP PROCEDURE IF EXISTS login;
-DROP PROCEDURE IF EXISTS register;
-DROP PROCEDURE IF EXISTS newEvent;
-DROP PROCEDURE IF EXISTS updateEvent;
-DROP PROCEDURE IF EXISTS deleteEvent;
-DROP PROCEDURE IF EXISTS new_daily_sleep_log;
-DROP PROCEDURE IF EXISTS update_daily_sleep_log;
-DROP PROCEDURE IF EXISTS get_daily_sleep_log;
+/*
+* Sleep Database Procedures
+* This file declares and initializes the procedures and triggers used in the sleep database.
+*
+* Tables: users, schedule_events, daily_sleep_logs, pre_sleep_behaviors, biometric_profiles
+* Audits: pre_sleep_behaviors, daily_sleep_logs, schedule_events
+*
+* Procedures: 
+*   user: login, register, 
+*   schedule_events: new_event, update_event, delete_event
+*   daily_sleep_logs: new_daily_sleep_log, update_daily_sleep_log, get_daily_sleep_log
+*   pre_sleep_behaviors: new_pre_sleep_behavior, update_pre_sleep_behavior, get_pre_sleep_behavior
+*   biometric_profiles: new_biometric_profiles, update_biometric_profiles, get_biometric_profiles
+*/
+
+DROP PROCEDURE IF EXISTS login;                                      -- userName
+DROP PROCEDURE IF EXISTS register;                                   -- user_name, hash_password
+DROP PROCEDURE IF EXISTS new_event;                                  -- userID, eventName, startTime, endTime, instanceType
+DROP PROCEDURE IF EXISTS update_event;                               -- userID, eventName, startTime, endTime, instanceType
+DROP PROCEDURE IF EXISTS delete_event;                               -- userID, eventName
+DROP PROCEDURE IF EXISTS new_daily_sleep_log;                        -- user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10
+DROP PROCEDURE IF EXISTS update_daily_sleep_log;                     -- user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10
+DROP PROCEDURE IF EXISTS get_daily_sleep_log;                        -- user_id, log_date
+DROP PROCEDURE IF EXISTS new_pre_sleep_behavior;                     -- log_id, fatigue_score, alertness_score, caffeine_cups, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity 
+DROP PROCEDURE IF EXISTS update_pre_sleep_behavior;                  -- log_id, fatigue_score, alertness_score, caffeine_cups, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity
+DROP PROCEDURE IF EXISTS get_pre_sleep_behavior;                     -- log_id
+DROP PROCEDURE IF EXISTS new_biometric_profiles;                     -- user_id, age, gender, height_cm, weight_kg
+DROP PROCEDURE IF EXISTS update_biometric_profiles;                  -- user_id, age, gender, height_cm, weight_kg
+DROP PROCEDURE IF EXISTS get_biometric_profiles;                     -- user_id
+DROP TRIGGER IF EXISTS insert_pre_sleep_behavior_audit;
+DROP TRIGGER IF EXISTS update_pre_sleep_behavior_audit;
+DROP TRIGGER IF EXISTS delete_pre_sleep_behavior_audit;
 DROP TRIGGER IF EXISTS insert_daily_sleep_log_audit;
 DROP TRIGGER IF EXISTS update_daily_sleep_log_audit;
+DROP TRIGGER IF EXISTS delete_daily_sleep_log_audit;
+DROP TRIGGER IF EXISTS insert_schedule_event_audit;
+DROP TRIGGER IF EXISTS update_schedule_event_audit;
+DROP TRIGGER IF EXISTS delete_schedule_event_audit;
+
 
 DELIMITER //
 
@@ -17,39 +46,39 @@ DELIMITER //
 
 CREATE PROCEDURE login(userName varchar(255))
 BEGIN
-	SELECT userID, securedPassword
+	SELECT user_id, secured_password
     FROM users
-    WHERE users.userName = userName;
+    WHERE users.user_name = userName;
 END//
 
-CREATE PROCEDURE register(userName varchar(255), hashPassword varchar(255))
+CREATE PROCEDURE register(user_name varchar(255), hash_password varchar(255))
 BEGIN
-	INSERT INTO users(userName, securedPassword)
-    VALUES(userName, hashPassword);
+	INSERT INTO users(user_name, secured_password)
+    VALUES(user_name, hash_password);
 END//
 
--- SCHEDULE
+-- Schedule-Events
 
-CREATE PROCEDURE newEvent(userID int, eventName varchar(255), startTime time, endTime time, instanceType enum('Single','Routine'))
+CREATE PROCEDURE new_event(userID int, eventName varchar(255), startTime time, endTime time, instanceType enum('Single','Routine'))
 BEGIN
-	INSERT INTO schedule_events(userID, eventName, startTime, endTime ,instanceType)
+	INSERT INTO schedule_events(user_id, event_name, start_time, end_time ,instance_type)
     VALUES(userID, eventName, startTime, endTime, instanceType);
 END//
 
-CREATE PROCEDURE updateEvent(userID int, eventName varchar(255), startTime time, endTime time, instanceType enum('Single','Routine'))
+CREATE PROCEDURE update_event(userID int, eventName varchar(255), startTime time, endTime time, instanceType enum('Single','Routine'))
 BEGIN
 	UPDATE schedule_events
-    SET schedule_events.startTime = startTime, schedule_events.endTime = endTime, schedule_events.instanceType = instanceType
-    WHERE schedule_events.userID = userID AND schedule_events.eventName = eventName;
+    SET schedule_events.start_time = startTime, schedule_events.end_time = endTime, schedule_events.instance_type = instanceType
+    WHERE schedule_events.user_id = userID AND schedule_events.event_name = eventName;
 END//
 
-CREATE PROCEDURE deleteEvent(userID int, eventName varchar(255))
+CREATE PROCEDURE delete_event(userID int, eventName varchar(255))
 BEGIN
 	DELETE FROM schedule_events
-    WHERE schedule_events.userID = userID AND schedule_events.eventName = eventName;
+    WHERE schedule_events.user_id = userID AND schedule_events.event_name = eventName;
 END//
 
--- MORNING
+-- Daily Sleep Logs
 
 CREATE PROCEDURE new_daily_sleep_log(user_id INT, log_date DATE, bed_time DATETIME, wake_time DATETIME, latency_mins SMALLINT, awakenings_count TINYINT, awakening_latency_mins SMALLINT, rating_1_10 TINYINT)
 BEGIN
@@ -93,6 +122,28 @@ BEGIN
     WHERE pre_sleep_behaviors.behavior_id = behavior_id;
 END//
 
+-- Biometric Profiles
+
+CREATE PROCEDURE new_biometric_profiles(user_id INT, age TINYINT, gender ENUM('Male', 'Female'), height_cm DECIMAL(5,2), weight_kg DECIMAL(5,2))
+BEGIN
+	INSERT INTO biometric_profiles(user_id, age, gender, height_cm, weight_kg)
+    VALUES(user_id, age, gender, height_cm, weight_kg);
+END//
+
+CREATE PROCEDURE update_biometric_profiles(profile_id INT, age TINYINT, gender ENUM('Male', 'Female'), height_cm DECIMAL(5,2), weight_kg DECIMAL(5,2))
+BEGIN
+	UPDATE biometric_profiles
+    SET biometric_profiles.age = age, biometric_profiles.gender = gender, biometric_profiles.height_cm = height_cm, biometric_profiles.weight_kg = weight_kg
+    WHERE biometric_profiles.profile_id = profile_id;
+END//
+
+CREATE PROCEDURE get_biometric_profiles(profile_id INT)
+BEGIN
+	SELECT profile_id, age, gender, height_cm, weight_kg
+    FROM biometric_profiles
+    WHERE biometric_profiles.profile_id = profile_id;
+END//
+
 -- Triggers
 
 -- Daily Sleep Log
@@ -123,7 +174,7 @@ END//
 
 -- Pre-Sleep Behaviors
 
-CREATE TRIGGER insert_daily_sleep_log_audit
+CREATE TRIGGER insert_pre_sleep_behavior_audit
 AFTER INSERT ON pre_sleep_behaviors
 FOR EACH ROW
 BEGIN
@@ -147,6 +198,31 @@ BEGIN
 	VALUES("Delete", old.behavior_id, old.fatigue_score, old.alertness_score, old.caffeine_cups, old.melatonin_mg, old.last_meal_hrs, old.last_meal_size, old.exercise_mins, old.exercise_intensity);
 END//
 
+-- Schedule Events
+
+CREATE TRIGGER insert_schedule_event_audit
+AFTER INSERT ON schedule_events
+FOR EACH ROW
+BEGIN
+	INSERT INTO schedule_events_audit(auditType, eventID, newEventName, newStartTime, newEndTime, newInstanceType)
+	VALUES("Insert", new.eventID, new.event_name, new.start_time, new.end_time, new.instance_type);
+END//
+
+CREATE TRIGGER update_schedule_event_audit
+AFTER UPDATE ON schedule_events
+FOR EACH ROW
+BEGIN
+	INSERT INTO schedule_events_audit(auditType, eventID, newEventName, oldEventName, newStartTime, oldStartTime, newEndTime, oldEndTime, newInstanceType, oldInstanceType)
+	VALUES("Update", old.eventID, new.event_name, old.event_name, new.start_time, old.start_time, new.end_time, old.end_time, new.instance_type, old.instance_type);
+END//
+
+CREATE TRIGGER delete_schedule_event_audit
+AFTER DELETE ON schedule_events
+FOR EACH ROW
+BEGIN
+	INSERT INTO schedule_events_audit(auditType, eventID, oldEventName, oldStartTime, oldEndTime, oldInstanceType)
+	VALUES("Delete", old.eventID, old.event_name, old.start_time, old.end_time, old.instance_type);
+END//
 
 DELIMITER ;
 

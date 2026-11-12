@@ -1,3 +1,12 @@
+/*
+* Sleep Database Declaration
+* This file declares the tables used in the sleep database.
+*
+* Tables: users, schedule_events, daily_sleep_logs, pre_sleep_behaviors, biometric_profiles
+* Audits: pre_sleep_behaviors, daily_sleep_logs, schedule_events
+*
+*/
+
 
 -- create the database
 DROP DATABASE IF EXISTS sleepyNASA;
@@ -6,7 +15,7 @@ CREATE DATABASE sleepyNASA;
 -- select the database
 USE sleepyNASA;
 
--- clean
+
 CREATE TABLE users(
  user_id int NOT NULL AUTO_INCREMENT,
  user_name varchar(255) UNIQUE NOT NULL,
@@ -15,23 +24,6 @@ CREATE TABLE users(
  PRIMARY KEY(user_id)
 );
 CREATE INDEX idx_user_user_name ON users(user_name);
-
-
-CREATE TABLE pre_sleep_behaviors ( 
-behavior_id INT AUTO_INCREMENT PRIMARY KEY,
-log_id INT NOT NULL,
-fatigue_score TINYINT CHECK (fatigue_score BETWEEN 0 AND 10),
-alertness_score TINYINT CHECK (alertness_score BETWEEN 0 AND 10),
-caffeine_cups TINYINT DEFAULT 0,
-melatonin_mg DECIMAL(4,2) DEFAULT 0.0,
-last_meal_hrs DECIMAL(4,1) NOT NULL,
-last_meal_size INT CHECK (last_meal_size BETWEEN 1 AND 5),
-exercise_mins SMALLINT DEFAULT 0,
-exercise_intensity TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
-
-FOREIGN KEY (log_id) REFERENCES daily_sleep_logs(log_id) ON DELETE CASCADE
-) 
-ENGINE=InnoDB;
 
 
 CREATE TABLE daily_sleep_logs ( 
@@ -52,6 +44,22 @@ UNIQUE KEY uq_user_date (user_id, log_date)
 ENGINE=InnoDB;
 
 
+CREATE TABLE pre_sleep_behaviors ( 
+behavior_id INT AUTO_INCREMENT PRIMARY KEY,
+log_id INT NOT NULL,
+fatigue_score TINYINT CHECK (fatigue_score BETWEEN 0 AND 10),
+alertness_score TINYINT CHECK (alertness_score BETWEEN 0 AND 10),
+caffeine_cups TINYINT DEFAULT 0,
+melatonin_mg DECIMAL(4,2) DEFAULT 0.0,
+last_meal_hrs DECIMAL(4,1) NOT NULL,
+last_meal_size INT CHECK (last_meal_size BETWEEN 1 AND 5),
+exercise_mins SMALLINT DEFAULT 0,
+exercise_intensity TINYINT CHECK (exercise_intensity BETWEEN 0 AND 10),
+
+FOREIGN KEY (log_id) REFERENCES daily_sleep_logs(log_id) ON DELETE CASCADE
+) 
+ENGINE=InnoDB;
+
 CREATE TABLE biometric_profiles ( 
 
 profile_id INT AUTO_INCREMENT PRIMARY KEY, 
@@ -66,13 +74,7 @@ FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
 ENGINE=InnoDB; 
 
-/*
-schedule_id
-user_id
-busy_start
-busy_end
-event_label
-*/
+
 CREATE TABLE schedule_events(
 
 eventID INT NOT NULL AUTO_INCREMENT,
