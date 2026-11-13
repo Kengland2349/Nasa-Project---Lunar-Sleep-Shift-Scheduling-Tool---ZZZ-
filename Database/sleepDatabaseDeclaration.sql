@@ -92,13 +92,10 @@ FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 CREATE TABLE missed_events(
 
 missed_event_id INT AUTO_INCREMENT PRIMARY KEY,
-user_id INT NOT NULL,
 event_id INT NOT NULL UNIQUE,
 arrival_time DATETIME,
 event_name varchar(255),
-FOREIGN KEY(event_id) REFERENCES schedule_events(event_id) ON DELETE CASCADE,
-UNIQUE KEY uq_user_event (user_id, event_id)
-FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+FOREIGN KEY(event_id) REFERENCES schedule_events(event_id) ON DELETE CASCADE
 );
 
 -- Audit tables

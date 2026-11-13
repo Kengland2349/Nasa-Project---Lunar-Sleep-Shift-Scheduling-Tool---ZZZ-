@@ -238,7 +238,7 @@ AFTER INSERT ON schedule_events
 FOR EACH ROW
 BEGIN
 	INSERT INTO schedule_events_audit(auditType, eventID, new_event_name, new_start_time, new_end_time, new_event_date, new_instance_type)
-	VALUES("Insert", new.eventID, new.event_name, new.start_time, new.end_time, new.event_date, new.instance_type);
+	VALUES("Insert", new.event_id, new.event_name, new.start_time, new.end_time, new.event_date, new.instance_type);
 END//
 
 CREATE TRIGGER update_schedule_event_audit
@@ -246,7 +246,7 @@ AFTER UPDATE ON schedule_events
 FOR EACH ROW
 BEGIN
 	INSERT INTO schedule_events_audit(auditType, eventID, new_event_name, old_event_name, new_start_time, old_start_time, new_end_time, old_end_time, new_event_date, old_event_date, new_instance_type, old_instance_type)
-	VALUES("Update", old.eventID, new.event_name, old.event_name, new.start_time, old.start_time, new.end_time, old.end_time, new.event_date, old.event_date, new.instance_type, old.instance_type);
+	VALUES("Update", old.event_id, new.event_name, old.event_name, new.start_time, old.start_time, new.end_time, old.end_time, new.event_date, old.event_date, new.instance_type, old.instance_type);
 END//
 
 CREATE TRIGGER delete_schedule_event_audit
@@ -254,7 +254,7 @@ AFTER DELETE ON schedule_events
 FOR EACH ROW
 BEGIN
 	INSERT INTO schedule_events_audit(auditType, eventID, oldEventName, oldStartTime, oldEndTime, oldInstanceType)
-	VALUES("Delete", old.eventID, old.event_name, old.start_time, old.end_time, old.instance_type);
+	VALUES("Delete", old.event_id, old.event_name, old.start_time, old.end_time, old.instance_type);
 END//
 
 DELIMITER ;
