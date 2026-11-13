@@ -84,8 +84,7 @@ start_time TIME NOT NULL,
 end_time TIME NOT NULL,
 event_date DATE NOT NULL,
 instance_type ENUM('Single', 'Routine') NOT NULL,
-
-
+routine_frequency ENUM('Daily', 'Weekly', 'Monthly') DEFAULT NULL,
 
 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );

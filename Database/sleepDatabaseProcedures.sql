@@ -18,6 +18,10 @@ DROP PROCEDURE IF EXISTS register;                                   -- user_nam
 DROP PROCEDURE IF EXISTS new_event;                                  -- userID, eventName, startTime, endTime, eventDate, instanceType
 DROP PROCEDURE IF EXISTS update_event;                               -- userID, eventName, startTime, endTime, eventDate, instanceType
 DROP PROCEDURE IF EXISTS delete_event;                               -- userID, eventName, eventDate
+DROP PROCEDURE IF EXISTS get_event;                                  -- userID, eventDate
+DROP PROCEDURE IF EXISTS new_missed_event;                           -- user_id, event_id, arrival_time, event_name
+DROP PROCEDURE IF EXISTS update_missed_event;                        -- event_id, arrival_time, event_name
+DROP PROCEDURE IF EXISTS get_missed_event;                           -- event_id
 DROP PROCEDURE IF EXISTS new_daily_sleep_log;                        -- user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10
 DROP PROCEDURE IF EXISTS update_daily_sleep_log;                     -- user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10
 DROP PROCEDURE IF EXISTS get_daily_sleep_log;                        -- user_id, log_date
@@ -59,16 +63,16 @@ END//
 
 -- Schedule-Events
 
-CREATE PROCEDURE new_event(user_id int, event_name varchar(255), start_time time, end_time time, event_date DATE, instance_type enum('Single','Routine'))
+CREATE PROCEDURE new_event(user_id int, event_name varchar(255), start_time time, end_time time, event_date DATE, instance_type enum('Single','Routine'), routine_frequency enum('Daily','Weekly','Monthly'))
 BEGIN
-	INSERT INTO schedule_events(user_id, event_name, start_time, end_time, event_date, instance_type)
-    VALUES(user_id, event_name, start_time, end_time, event_date, instance_type);
+	INSERT INTO schedule_events(user_id, event_name, start_time, end_time, event_date, instance_type, routine_frequency)
+    VALUES(user_id, event_name, start_time, end_time, event_date, instance_type, routine_frequency);
 END//
 
-CREATE PROCEDURE update_event(user_id int, event_name varchar(255), start_time time, end_time time, event_date DATE, instance_type enum('Single','Routine'))
+CREATE PROCEDURE update_event(user_id int, event_name varchar(255), start_time time, end_time time, event_date DATE, instance_type enum('Single','Routine'), routine_frequency enum('Daily','Weekly','Monthly'))
 BEGIN
 	UPDATE schedule_events
-    SET schedule_events.start_time = start_time, schedule_events.end_time = end_time, schedule_events.event_date = event_date, schedule_events.instance_type = instance_type
+    SET schedule_events.start_time = start_time, schedule_events.end_time = end_time, schedule_events.event_date = event_date, schedule_events.instance_type = instance_type, schedule_events.routine_frequency = routine_frequency
     WHERE schedule_events.user_id = user_id AND schedule_events.event_name = event_name;
 END//
 
@@ -80,7 +84,7 @@ END//
 
 CREATE PROCEDURE get_event(user_id int, event_date DATE)
 BEGIN
-	SELECT event_id, event_name, start_time, end_time, instance_type
+	SELECT event_id, event_name, start_time, end_time, instance_type, routine_frequency
     FROM schedule_events
     WHERE schedule_events.user_id = user_id AND schedule_events.event_date = event_date;
 END//
