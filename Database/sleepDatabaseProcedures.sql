@@ -15,9 +15,9 @@
 
 DROP PROCEDURE IF EXISTS login;                                      -- userName
 DROP PROCEDURE IF EXISTS register;                                   -- user_name, hash_password
-DROP PROCEDURE IF EXISTS new_event;                                  -- userID, eventName, startTime, endTime, instanceType
-DROP PROCEDURE IF EXISTS update_event;                               -- userID, eventName, startTime, endTime, instanceType
-DROP PROCEDURE IF EXISTS delete_event;                               -- userID, eventName
+DROP PROCEDURE IF EXISTS new_event;                                  -- userID, eventName, startTime, endTime, eventDate, instanceType
+DROP PROCEDURE IF EXISTS update_event;                               -- userID, eventName, startTime, endTime, eventDate, instanceType
+DROP PROCEDURE IF EXISTS delete_event;                               -- userID, eventName, eventDate
 DROP PROCEDURE IF EXISTS new_daily_sleep_log;                        -- user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10
 DROP PROCEDURE IF EXISTS update_daily_sleep_log;                     -- user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10
 DROP PROCEDURE IF EXISTS get_daily_sleep_log;                        -- user_id, log_date
@@ -44,49 +44,78 @@ DELIMITER //
 
 -- USER
 
-CREATE PROCEDURE login(userName varchar(255))
+CREATE PROCEDURE login(user_name varchar(255))
 BEGIN
 	SELECT user_id, secured_password
     FROM users
-    WHERE users.user_name = userName;
+    WHERE users.user_name = user_name;
 END//
 
-CREATE PROCEDURE register(user_name varchar(255), hash_password varchar(255))
+CREATE PROCEDURE register(user_name varchar(255), hashed_password varchar(255))
 BEGIN
 	INSERT INTO users(user_name, secured_password)
-    VALUES(user_name, hash_password);
+    VALUES(user_name, hashed_password);
 END//
 
 -- Schedule-Events
 
-CREATE PROCEDURE new_event(userID int, eventName varchar(255), startTime time, endTime time, instanceType enum('Single','Routine'))
+CREATE PROCEDURE new_event(user_id int, event_name varchar(255), start_time time, end_time time, event_date DATE, instance_type enum('Single','Routine'))
 BEGIN
-	INSERT INTO schedule_events(user_id, event_name, start_time, end_time ,instance_type)
-    VALUES(userID, eventName, startTime, endTime, instanceType);
+	INSERT INTO schedule_events(user_id, event_name, start_time, end_time, event_date, instance_type)
+    VALUES(user_id, event_name, start_time, end_time, event_date, instance_type);
 END//
 
-CREATE PROCEDURE update_event(userID int, eventName varchar(255), startTime time, endTime time, instanceType enum('Single','Routine'))
+CREATE PROCEDURE update_event(user_id int, event_name varchar(255), start_time time, end_time time, event_date DATE, instance_type enum('Single','Routine'))
 BEGIN
 	UPDATE schedule_events
-    SET schedule_events.start_time = startTime, schedule_events.end_time = endTime, schedule_events.instance_type = instanceType
-    WHERE schedule_events.user_id = userID AND schedule_events.event_name = eventName;
+    SET schedule_events.start_time = start_time, schedule_events.end_time = end_time, schedule_events.event_date = event_date, schedule_events.instance_type = instance_type
+    WHERE schedule_events.user_id = user_id AND schedule_events.event_name = event_name;
 END//
 
-CREATE PROCEDURE delete_event(userID int, eventName varchar(255))
+CREATE PROCEDURE delete_event(user_id int, event_name varchar(255), event_date DATE)
 BEGIN
 	DELETE FROM schedule_events
-    WHERE schedule_events.user_id = userID AND schedule_events.event_name = eventName;
+    WHERE schedule_events.user_id = user_id AND schedule_events.event_name = event_name AND schedule_events.event_date = event_date;
+END//
+
+CREATE PROCEDURE get_event(user_id int, event_date DATE)
+BEGIN
+	SELECT event_id, event_name, start_time, end_time, instance_type
+    FROM schedule_events
+    WHERE schedule_events.user_id = user_id AND schedule_events.event_date = event_date;
+END//
+
+-- Missed Events
+
+CREATE PROCEDURE new_missed_event(user_id int, event_id INT, arrival_time DATETIME, event_name varchar(255))
+BEGIN
+	INSERT INTO missed_events(user_id, event_id, arrival_time, event_name)
+    VALUES(user_id, event_id, arrival_time, event_name);
+END//
+
+CREATE PROCEDURE update_missed_event(user_id int, event_id INT, arrival_time DATETIME, event_name varchar(255))
+BEGIN
+	UPDATE missed_events
+    SET missed_events.event_name = event_name, missed_events.arrival_time = arrival_time
+    WHERE missed_events.user_id = user_id AND missed_events.event_id = event_id;
+END//
+
+CREATE PROCEDURE get_missed_event(event_id INT)
+BEGIN
+	SELECT missed_event_id, arrival_time, event_name
+    FROM missed_events
+    WHERE missed_events.event_id = event_id;
 END//
 
 -- Daily Sleep Logs
 
-CREATE PROCEDURE new_daily_sleep_log(user_id INT, log_date DATE, bed_time DATETIME, wake_time DATETIME, latency_mins SMALLINT, awakenings_count TINYINT, awakening_latency_mins SMALLINT, rating_1_10 TINYINT)
+CREATE PROCEDURE new_daily_sleep_log(user_id INT, log_date DATE, bed_time TIME, wake_time TIME, latency_mins SMALLINT, awakenings_count TINYINT, awakening_latency_mins SMALLINT, rating_1_10 TINYINT)
 BEGIN
 	INSERT INTO daily_sleep_logs(user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10)
     VALUES(user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10);
 END//
 
-CREATE PROCEDURE update_daily_sleep_log(user_id INT, log_date DATE, bed_time DATETIME, wake_time DATETIME, latency_mins SMALLINT, awakenings_count TINYINT, awakening_latency_mins SMALLINT, rating_1_10 TINYINT)
+CREATE PROCEDURE update_daily_sleep_log(user_id INT, log_date DATE, bed_time TIME, wake_time TIME, latency_mins SMALLINT, awakenings_count TINYINT, awakening_latency_mins SMALLINT, rating_1_10 TINYINT)
 BEGIN
 	UPDATE daily_sleep_logs
     SET daily_sleep_logs.bed_time = bed_time, daily_sleep_logs.wake_time = wake_time, daily_sleep_logs.latency_mins = latency_mins, daily_sleep_logs.awakenings_count = awakenings_count, daily_sleep_logs.awakening_latency_mins = awakening_latency_mins, daily_sleep_logs.rating_1_10 = rating_1_10
@@ -102,13 +131,13 @@ END//
 
 -- Pre-Sleep Behaviors
 
-CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_cups TINYINT, melatonin_mg SMALLINT, last_meal_hrs TINYINT, last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
+CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_cups TINYINT, melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
 BEGIN
 	INSERT INTO pre_sleep_behaviors(log_id, fatigue_score, alertness_score, caffeine_cups, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity)
     VALUES(log_id, fatigue_score, alertness_score, caffeine_cups, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity);
 END//
 
-CREATE PROCEDURE update_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_cups TINYINT, melatonin_mg SMALLINT, last_meal_hrs TINYINT, last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
+CREATE PROCEDURE update_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_cups TINYINT, melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
 BEGIN
 	UPDATE pre_sleep_behaviors
     SET pre_sleep_behaviors.fatigue_score = fatigue_score, pre_sleep_behaviors.alertness_score = alertness_score, pre_sleep_behaviors.caffeine_cups = caffeine_cups, pre_sleep_behaviors.melatonin_mg = melatonin_mg, pre_sleep_behaviors.last_meal_hrs = last_meal_hrs, pre_sleep_behaviors.last_meal_size = last_meal_size, pre_sleep_behaviors.exercise_mins = exercise_mins, pre_sleep_behaviors.exercise_intensity = exercise_intensity
@@ -204,16 +233,16 @@ CREATE TRIGGER insert_schedule_event_audit
 AFTER INSERT ON schedule_events
 FOR EACH ROW
 BEGIN
-	INSERT INTO schedule_events_audit(auditType, eventID, newEventName, newStartTime, newEndTime, newInstanceType)
-	VALUES("Insert", new.eventID, new.event_name, new.start_time, new.end_time, new.instance_type);
+	INSERT INTO schedule_events_audit(auditType, eventID, new_event_name, new_start_time, new_end_time, new_event_date, new_instance_type)
+	VALUES("Insert", new.eventID, new.event_name, new.start_time, new.end_time, new.event_date, new.instance_type);
 END//
 
 CREATE TRIGGER update_schedule_event_audit
 AFTER UPDATE ON schedule_events
 FOR EACH ROW
 BEGIN
-	INSERT INTO schedule_events_audit(auditType, eventID, newEventName, oldEventName, newStartTime, oldStartTime, newEndTime, oldEndTime, newInstanceType, oldInstanceType)
-	VALUES("Update", old.eventID, new.event_name, old.event_name, new.start_time, old.start_time, new.end_time, old.end_time, new.instance_type, old.instance_type);
+	INSERT INTO schedule_events_audit(auditType, eventID, new_event_name, old_event_name, new_start_time, old_start_time, new_end_time, old_end_time, new_event_date, old_event_date, new_instance_type, old_instance_type)
+	VALUES("Update", old.eventID, new.event_name, old.event_name, new.start_time, old.start_time, new.end_time, old.end_time, new.event_date, old.event_date, new.instance_type, old.instance_type);
 END//
 
 CREATE TRIGGER delete_schedule_event_audit

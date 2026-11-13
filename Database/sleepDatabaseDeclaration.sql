@@ -30,8 +30,8 @@ CREATE TABLE daily_sleep_logs (
 log_id INT AUTO_INCREMENT PRIMARY KEY, 
 user_id INT NOT NULL, 
 log_date DATE NOT NULL UNIQUE,
-bed_time DATETIME NOT NULL, 
-wake_time DATETIME NOT NULL,
+bed_time TIME NOT NULL, 
+wake_time TIME NOT NULL,
 latency_mins SMALLINT DEFAULT 0, 
 awakenings_count TINYINT DEFAULT 0, 
 awakening_latency_mins SMALLINT DEFAULT 0,
@@ -77,25 +77,28 @@ ENGINE=InnoDB;
 
 CREATE TABLE schedule_events(
 
-eventID INT NOT NULL AUTO_INCREMENT,
+event_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 user_id INT NOT NULL,
-event_name varchar(255) ,
-start_time time NOT NULL,
-end_time time NOT NULL,
-instance_type ENUM('Single', 'Routine'),
+event_name VARCHAR(255) NOT NULL,
+start_time TIME NOT NULL,
+end_time TIME NOT NULL,
+event_date DATE NOT NULL,
+instance_type ENUM('Single', 'Routine') NOT NULL,
 
-PRIMARY KEY(eventID),
+
 
 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE missed_events(
 
-event_id INT AUTO_INCREMENT PRIMARY KEY,
-user_id int,
-planned_time DATETIME,
+missed_event_id INT AUTO_INCREMENT PRIMARY KEY,
+user_id INT NOT NULL,
+event_id INT NOT NULL UNIQUE,
 arrival_time DATETIME,
-
+event_name varchar(255),
+FOREIGN KEY(event_id) REFERENCES schedule_events(event_id) ON DELETE CASCADE,
+UNIQUE KEY uq_user_event (user_id, event_id)
 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
@@ -135,10 +138,10 @@ log_audit_id INT AUTO_INCREMENT PRIMARY KEY,
 log_audit_type ENUM("Insert", "Update", "Delete") NOT NULL,
 log_id INT, 
 log_date DATE NOT NULL UNIQUE,
-old_bed_time DATETIME NOT NULL, 
-new_bed_time DATETIME, 
-old_wake_time DATETIME NOT NULL,
-new_wake_time DATETIME,
+old_bed_time TIME NOT NULL, 
+new_bed_time TIME, 
+old_wake_time TIME NOT NULL,
+new_wake_time TIME,
 old_latency_mins SMALLINT, 
 new_latency_mins SMALLINT, 
 old_awakenings_count TINYINT, 
@@ -153,22 +156,20 @@ ENGINE=InnoDB;
 
 CREATE TABLE schedule_events_audit(
 
-auditID INT NOT NULL AUTO_INCREMENT,
-auditType varchar(8) NOT NULL,
-eventID INT NOT NULL,
+audit_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+audit_type varchar(8) NOT NULL,
+event_id INT NOT NULL,
 
-newEventName varchar(255),
-oldEventName varchar(255),
-newStartTime time,
-oldStartTime time,
-newEndTime time,
-oldEndTime time,
-newInstanceType ENUM('Single', 'Routine'),
-oldInstanceType ENUM('Single', 'Routine'),
+new_event_name varchar(255),
+old_event_name varchar(255),
+new_start_time time,
+old_start_time time,
+new_end_time time,
+old_end_time time,
+new_event_date DATE,
+old_event_date DATE,
+new_instance_type ENUM('Single', 'Routine'),
+old_instance_type ENUM('Single', 'Routine'),
 
-PRIMARY KEY(auditID),
-
-CONSTRAINT fk_events_audit
-FOREIGN KEY(eventID) REFERENCES schedule_events(eventID)
+CONSTRAINT fk_events_audit FOREIGN KEY(event_id) REFERENCES schedule_events(event_id)
 );
-
