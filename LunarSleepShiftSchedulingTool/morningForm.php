@@ -28,7 +28,8 @@
                     'rating',
                     FILTER_VALIDATE_INT
                     );
-                /*
+                
+                
                 $userID = $_SESSION['user_ID'];
                 $date = date('Y-m-d');
                 
@@ -38,11 +39,16 @@
                 
                 $stmt->execute([$userID, $date, $bedTime, $wakeTime, $sleep_latency, $awakenings, $awakenings_time_avg, $rating]);
                 $result = $stmt->fetch();
-                */
+                
+                
                 unset($_SESSION['page']);
                 refresh();
             }
             
+        }
+        else if ($formType === 'back_button') {
+            unset($_SESSION['page']);
+            refresh();
         }
     }
 ?>
@@ -135,5 +141,14 @@
     
     <a href="#" class="pseudo-button" role="button" onclick="this.closest('form').submit(); return false;">
     	Submit
+    </a>
+</form>
+
+<hr>
+
+<form action="" method="POST" class="back_button">
+	<input type="hidden" name="form_type" value="back_button">
+    <a href="#" class="pseudo-button" role="button" onclick="this.closest('form').submit(); return false;">
+    	Back
     </a>
 </form>

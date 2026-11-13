@@ -30,10 +30,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         
         if ($submit) {
+            $fatigue = filter_input(
+                INPUT_POST,
+                'fatigue',
+                FILTER_VALIDATE_INT
+                );
+            $alert = filter_input(
+                INPUT_POST,
+                'alert',
+                FILTER_VALIDATE_INT
+                );
+            $caffeine_time = $_POST['caffeine_time'] ?? '';
+            $melatonin_amt = $_POST['melatonin_amt'] ?? '';
+            $last_meal_time = $_POST['last_meal_time'] ?? '';
+            $last_meal_size = filter_input(
+                INPUT_POST,
+                'last_meal_size',
+                FILTER_VALIDATE_INT
+                );
+            $exercise_duration = $_POST['exercise_duration'] ?? '';
+            $exercise_time = $_POST['exercise_time'] ?? '';
+            $exercise_intensity =  filter_input(
+                INPUT_POST,
+                'exercise_intensity',
+                FILTER_VALIDATE_INT
+                );
+            
+            
+            
+            $userID = $_SESSION['user_ID'];
+            
+            //TODO: add the ability to sumbit data to the database
+            
             unset($_SESSION['page']);
             refresh();
         }
         
+    }
+    else if ($formType === 'back_button') {
+        unset($_SESSION['page']);
+        refresh();
     }
 }
 ?>
@@ -251,5 +287,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     <a href="#" class="pseudo-button" role="button" onclick="this.closest('form').submit(); return false;">
     	Submit
+    </a>
+</form>
+
+<hr>
+
+<form action="" method="POST" class="back_button">
+	<input type="hidden" name="form_type" value="back_button">
+    <a href="#" class="pseudo-button" role="button" onclick="this.closest('form').submit(); return false;">
+    	Back
     </a>
 </form>

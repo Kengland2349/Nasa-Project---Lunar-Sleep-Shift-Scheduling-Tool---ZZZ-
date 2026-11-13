@@ -24,11 +24,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         
         
+        
+        
         if ($submit) {
+            
+            $gender = $_POST['gender'] ?? '';
+            $height_inches = $_POST['height_inches'] ?? '';
+            $weight_lbs = $_POST['weight_lbs'] ?? '';
+            $age = $_POST['age'] ?? '';
+            
+            //TODO: add the ability to sumbit data to the database
+            
             unset($_SESSION['page']);
             refresh();
         }
         
+    }
+    else if ($formType === 'back_button') {
+        unset($_SESSION['page']);
+        refresh();
     }
 }
 ?>
@@ -94,5 +108,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     <a href="#" class="pseudo-button" role="button" onclick="this.closest('form').submit(); return false;">
     	Submit
+    </a>
+</form>
+
+<hr>
+
+<form action="" method="POST" class="back_button">
+	<input type="hidden" name="form_type" value="back_button">
+    <a href="#" class="pseudo-button" role="button" onclick="this.closest('form').submit(); return false;">
+    	Back
     </a>
 </form>

@@ -7,11 +7,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($formType === 'missed_event_form') {
         $submit = true;
         
+        //TODO: add the ability to sumbit data to the database
+        
         if ($submit) {
             unset($_SESSION['page']);
             refresh();
         }
         
+    }
+    else if ($formType === 'back_button') {
+        unset($_SESSION['page']);
+        refresh();
     }
 }
 ?>
@@ -63,3 +69,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     	Submit
     </a>
 </form>
+
+<hr>
+
+<form action="" method="POST" class="back_button">
+	<input type="hidden" name="form_type" value="back_button">
+    <a href="#" class="pseudo-button" role="button" onclick="this.closest('form').submit(); return false;">
+    	Back
+    </a>
+</form>
+
