@@ -1,7 +1,14 @@
 <?php
+    ob_start(); // buffers the PHP code
     session_start();
     
+    /*echo '<pre>';
+    var_dump($_SESSION);
+    echo '</pre>';*/
+    
     include 'connection.php';
+    include 'header.php';
+    include 'utils.php';
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $formType = $_POST['form_type'] ?? '';
@@ -9,13 +16,12 @@
             $_SESSION = [];
             session_destroy();
             
-            header('Location: index.php');
-            exit;
+            refresh();
         }
     }
     
     
-    include 'header.php';
+    
     
     if (!isset($_SESSION['user_ID'])) {
         if (isset($_SESSION['portalPage'])) {
@@ -30,7 +36,27 @@
             include 'portal.php';
         }
     } else {
-        include 'mainPage.php';
+        if (isset($_SESSION['page'])) {
+            if ($_SESSION['page'] == 'morning_form') {
+                include 'morningForm.php';
+            }
+            else if ($_SESSION['page'] == 'before_sleep_form') {
+                include 'beforeSleep.php';
+            }
+            else if ($_SESSION['page'] == 'biometrics_form') {
+                include 'biometrics.php';
+            }
+            else if ($_SESSION['page'] == 'schedule_event_form') {
+                include 'scheduleSurvey.php';
+            }
+            else if ($_SESSION['page'] == 'missed_event_form') {
+                include 'MissedEvents.php';
+            }
+            
+        }
+        else {
+            include 'mainPage.php';
+        }
     }
     
     if (isset($_SESSION['message'])) {
@@ -39,6 +65,7 @@
     }
     
     
+
 ?>
 
 

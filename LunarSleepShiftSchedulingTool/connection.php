@@ -1,7 +1,7 @@
 <?php
     // Database configuration
     $host    = 'localhost';
-    $db      = 'lunar-sleep-shifts-cheduling-tool';
+    $db      = 'sleepynasa';
     $user    = 'userTesting';
     $pass    = '171718Ab';
     $charset = 'utf8mb4';
