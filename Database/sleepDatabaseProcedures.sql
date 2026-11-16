@@ -133,6 +133,13 @@ BEGIN
     WHERE daily_sleep_logs.user_id = user_id AND daily_sleep_logs.log_date = log_date;
 END//
 
+CREATE PROCEDURE get_daily_sleep_log_id(user_id int, log_date DATE)
+BEGIN
+	SELECT log_id
+    FROM daily_sleep_logs
+    WHERE daily_sleep_logs.user_id = user_id AND daily_sleep_logs.log_date = log_date;
+END//
+
 -- Pre-Sleep Behaviors
 
 CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_cups TINYINT, melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
