@@ -25,6 +25,7 @@ DROP PROCEDURE IF EXISTS get_missed_event;                           -- event_id
 DROP PROCEDURE IF EXISTS new_daily_sleep_log;                        -- user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10
 DROP PROCEDURE IF EXISTS update_daily_sleep_log;                     -- user_id, log_date, bed_time, wake_time, latency_mins, awakenings_count, awakening_latency_mins, rating_1_10
 DROP PROCEDURE IF EXISTS get_daily_sleep_log;                        -- user_id, log_date
+DROP PROCEDURE IF EXISTS get_daily_sleep_log_id;                     -- user_id, log_date
 DROP PROCEDURE IF EXISTS new_pre_sleep_behavior;                     -- log_id, fatigue_score, alertness_score, caffeine_cups, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity 
 DROP PROCEDURE IF EXISTS update_pre_sleep_behavior;                  -- log_id, fatigue_score, alertness_score, caffeine_cups, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity
 DROP PROCEDURE IF EXISTS get_pre_sleep_behavior;                     -- log_id
