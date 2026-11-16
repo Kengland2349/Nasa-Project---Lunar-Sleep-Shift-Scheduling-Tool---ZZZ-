@@ -2,13 +2,14 @@
 * Sleep Database Procedures
 * This file declares and initializes the procedures and triggers used in the sleep database.
 *
-* Tables: users, schedule_events, daily_sleep_logs, pre_sleep_behaviors, biometric_profiles
+* Tables: users, schedule_events, missed_events, daily_sleep_logs, pre_sleep_behaviors, biometric_profiles
 * Audits: pre_sleep_behaviors, daily_sleep_logs, schedule_events
 *
 * Procedures: 
 *   user: login, register, 
 *   schedule_events: new_event, update_event, delete_event
-*   daily_sleep_logs: new_daily_sleep_log, update_daily_sleep_log, get_daily_sleep_log
+*   missed_events: new_missed_event, update_missed_event, get_missed_event
+*   daily_sleep_logs: new_daily_sleep_log, update_daily_sleep_log, get_daily_sleep_log, get_daily_sleep_log_id
 *   pre_sleep_behaviors: new_pre_sleep_behavior, update_pre_sleep_behavior, get_pre_sleep_behavior
 *   biometric_profiles: new_biometric_profiles, update_biometric_profiles, get_biometric_profiles
 */
@@ -143,24 +144,24 @@ END//
 
 -- Pre-Sleep Behaviors
 
-CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_cups TINYINT, melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
+CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_time TIME, caffeine_mg DECIMAL(5,2), melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
 BEGIN
-	INSERT INTO pre_sleep_behaviors(log_id, fatigue_score, alertness_score, caffeine_cups, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity)
-    VALUES(log_id, fatigue_score, alertness_score, caffeine_cups, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity);
+	INSERT INTO pre_sleep_behaviors(log_id, fatigue_score, alertness_score, caffeine_time, caffeine_mg, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity)
+    VALUES(log_id, fatigue_score, alertness_score, caffeine_time, caffeine_mg, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity);
 END//
 
-CREATE PROCEDURE update_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_cups TINYINT, melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
+CREATE PROCEDURE update_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_time TIME, caffeine_mg DECIMAL(5,2), melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
 BEGIN
 	UPDATE pre_sleep_behaviors
-    SET pre_sleep_behaviors.fatigue_score = fatigue_score, pre_sleep_behaviors.alertness_score = alertness_score, pre_sleep_behaviors.caffeine_cups = caffeine_cups, pre_sleep_behaviors.melatonin_mg = melatonin_mg, pre_sleep_behaviors.last_meal_hrs = last_meal_hrs, pre_sleep_behaviors.last_meal_size = last_meal_size, pre_sleep_behaviors.exercise_mins = exercise_mins, pre_sleep_behaviors.exercise_intensity = exercise_intensity
+    SET pre_sleep_behaviors.fatigue_score = fatigue_score, pre_sleep_behaviors.alertness_score = alertness_score, pre_sleep_behaviors.caffeine_time = caffeine_time, pre_sleep_behaviors.caffeine_mg = caffeine_mg, pre_sleep_behaviors.melatonin_mg = melatonin_mg, pre_sleep_behaviors.last_meal_hrs = last_meal_hrs, pre_sleep_behaviors.last_meal_size = last_meal_size, pre_sleep_behaviors.exercise_mins = exercise_mins, pre_sleep_behaviors.exercise_intensity = exercise_intensity
     WHERE pre_sleep_behaviors.log_id = log_id;
 END//
 
-CREATE PROCEDURE get_pre_sleep_behavior(behavior_id INT)
+CREATE PROCEDURE get_pre_sleep_behavior(log_id INT)
 BEGIN
-	SELECT behavior_id, fatigue_score, alertness_score, caffeine_cups, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity
+	SELECT behavior_id, fatigue_score, alertness_score, caffeine_time, caffeine_mg, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity
     FROM pre_sleep_behaviors
-    WHERE pre_sleep_behaviors.behavior_id = behavior_id;
+    WHERE pre_sleep_behaviors.log_id = log_id;
 END//
 
 -- Biometric Profiles
