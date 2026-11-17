@@ -144,10 +144,10 @@ END//
 
 -- Pre-Sleep Behaviors
 
-CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_time TIME, caffeine_mg DECIMAL(5,2), melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
+CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_mg SMALLINT, caffeine_time TIME, melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
 BEGIN
-	INSERT INTO pre_sleep_behaviors(log_id, fatigue_score, alertness_score, caffeine_time, caffeine_mg, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity)
-    VALUES(log_id, fatigue_score, alertness_score, caffeine_time, caffeine_mg, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity);
+	INSERT INTO pre_sleep_behaviors(log_id, fatigue_score, alertness_score, caffeine_mg, caffeine_time, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity)
+    VALUES(log_id, fatigue_score, alertness_score, caffeine_mg, caffeine_time, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity);
 END//
 
 CREATE PROCEDURE update_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_time TIME, caffeine_mg DECIMAL(5,2), melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
@@ -220,16 +220,16 @@ CREATE TRIGGER insert_pre_sleep_behavior_audit
 AFTER INSERT ON pre_sleep_behaviors
 FOR EACH ROW
 BEGIN
-	INSERT INTO pre_sleep_behaviors_audit(pre_sleep_audit_type, behavior_id, new_fatigue_score, new_alertness_score, new_caffeine_mg, new_caffiene_time, new_melatonin_mg, new_last_meal_hrs, new_last_meal_size, new_exercise_mins, new_exercise_intensity)
-	VALUES("Insert", new.behavior_id, new.fatigue_score, new.alertness_score, new.caffeine_mg, new.caffiene_time, new.melatonin_mg, new.last_meal_hrs, new.last_meal_size, new.exercise_mins, new.exercise_intensity);
+	INSERT INTO pre_sleep_behaviors_audit(pre_sleep_audit_type, behavior_id, new_fatigue_score, new_alertness_score, new_caffeine_mg, new_caffeine_time, new_melatonin_mg, new_last_meal_hrs, new_last_meal_size, new_exercise_mins, new_exercise_intensity)
+	VALUES("Insert", new.behavior_id, new.fatigue_score, new.alertness_score, new.caffeine_mg, new.caffeine_time, new.melatonin_mg, new.last_meal_hrs, new.last_meal_size, new.exercise_mins, new.exercise_intensity);
 END//
 
 CREATE TRIGGER update_pre_sleep_behavior_audit
 AFTER UPDATE ON pre_sleep_behaviors
 FOR EACH ROW
 BEGIN
-	INSERT INTO pre_sleep_behaviors_audit(pre_sleep_audit_type, behavior_id, new_fatigue_score, old_fatigue_score, new_alertness_score, old_alertness_score, new_caffiene_time, old_caffiene_time, new_caffeine_mg, old_caffeine_mg, new_melatonin_mg, old_melatonin_mg, new_last_meal_hrs, old_last_meal_hrs, new_last_meal_size, old_last_meal_size, new_exercise_mins, old_exercise_mins, new_exercise_intensity, old_exercise_intensity)
-	VALUES("Update", old.behavior_id, new.fatigue_score, old.fatigue_score, new.alertness_score, old.alertness_score, new.caffiene_time, old.caffiene_time, new.caffeine_mg, old.caffeine_mg, new.melatonin_mg, old.melatonin_mg, new.last_meal_hrs, old.last_meal_hrs, new.last_meal_size, old.last_meal_size, new.exercise_mins, old.exercise_mins, new.exercise_intensity, old.exercise_intensity);
+	INSERT INTO pre_sleep_behaviors_audit(pre_sleep_audit_type, behavior_id, new_fatigue_score, old_fatigue_score, new_alertness_score, old_alertness_score, new_caffeine_time, old_caffeine_time, new_caffeine_mg, old_caffeine_mg, new_melatonin_mg, old_melatonin_mg, new_last_meal_hrs, old_last_meal_hrs, new_last_meal_size, old_last_meal_size, new_exercise_mins, old_exercise_mins, new_exercise_intensity, old_exercise_intensity)
+	VALUES("Update", old.behavior_id, new.fatigue_score, old.fatigue_score, new.alertness_score, old.alertness_score, new.caffeine_time, old.caffeine_time, new.caffeine_mg, old.caffeine_mg, new.melatonin_mg, old.melatonin_mg, new.last_meal_hrs, old.last_meal_hrs, new.last_meal_size, old.last_meal_size, new.exercise_mins, old.exercise_mins, new.exercise_intensity, old.exercise_intensity);
 END//
 
 CREATE TRIGGER delete_pre_sleep_behavior_audit
@@ -237,7 +237,7 @@ AFTER DELETE ON pre_sleep_behaviors
 FOR EACH ROW
 BEGIN
 	INSERT INTO pre_sleep_behaviors_audit(pre_sleep_audit_type, behavior_id, old_fatigue_score, old_alertness_score, old_caffiene_time, old_caffeine_mg, old_melatonin_mg, old_last_meal_hrs, old_last_meal_size, old_exercise_mins, old_exercise_intensity)
-	VALUES("Delete", old.behavior_id, old.fatigue_score, old.alertness_score, old.caffiene_time, old.caffeine_mg, old.melatonin_mg, old.last_meal_hrs, old.last_meal_size, old.exercise_mins, old.exercise_intensity);
+	VALUES("Delete", old.behavior_id, old.fatigue_score, old.alertness_score, old.caffeine_time, old.caffeine_mg, old.melatonin_mg, old.last_meal_hrs, old.last_meal_size, old.exercise_mins, old.exercise_intensity);
 END//
 
 -- Schedule Events
@@ -267,5 +267,4 @@ BEGIN
 END//
 
 DELIMITER ;
-
 
