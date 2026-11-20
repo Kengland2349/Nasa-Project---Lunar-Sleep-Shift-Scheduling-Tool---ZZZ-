@@ -144,13 +144,13 @@ END//
 
 -- Pre-Sleep Behaviors
 
-CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_mg SMALLINT, caffeine_time TIME, melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size INT, exercise_mins SMALLINT, exercise_intensity TINYINT)
+CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_mg DECIMAL(6,2), caffeine_time TIME, melatonin_mg DECIMAL(6,2), last_meal_hrs DECIMAL(4,1), last_meal_size INT, exercise_mins SMALLINT, exercise_intensity TINYINT)
 BEGIN
 	INSERT INTO pre_sleep_behaviors(log_id, fatigue_score, alertness_score, caffeine_mg, caffeine_time, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity)
     VALUES(log_id, fatigue_score, alertness_score, caffeine_mg, caffeine_time, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity);
 END//
 
-CREATE PROCEDURE update_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_time TIME, caffeine_mg DECIMAL(5,2), melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size INT, exercise_mins SMALLINT, exercise_intensity TINYINT)
+CREATE PROCEDURE update_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_time TIME, caffeine_mg DECIMAL(6,2), melatonin_mg DECIMAL(6,2), last_meal_hrs DECIMAL(4,1), last_meal_size INT, exercise_mins SMALLINT, exercise_intensity TINYINT)
 BEGIN
 	UPDATE pre_sleep_behaviors
     SET pre_sleep_behaviors.fatigue_score = fatigue_score, pre_sleep_behaviors.alertness_score = alertness_score, pre_sleep_behaviors.caffeine_time = caffeine_time, pre_sleep_behaviors.caffeine_mg = caffeine_mg, pre_sleep_behaviors.melatonin_mg = melatonin_mg, pre_sleep_behaviors.last_meal_hrs = last_meal_hrs, pre_sleep_behaviors.last_meal_size = last_meal_size, pre_sleep_behaviors.exercise_mins = exercise_mins, pre_sleep_behaviors.exercise_intensity = exercise_intensity
