@@ -88,7 +88,6 @@ instance_type ENUM('Single', 'Routine') NOT NULL,
 routine_frequency ENUM('Daily', 'Weekly', 'Monthly') DEFAULT NULL,
 
 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-UNIQUE KEY uq_user_event_date (user_id, event_date, event_name)
 );
 
 CREATE TABLE missed_events(
