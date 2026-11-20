@@ -84,11 +84,11 @@ BEGIN
     WHERE schedule_events.user_id = user_id AND schedule_events.event_name = event_name AND schedule_events.event_date = event_date;
 END//
 
-CREATE PROCEDURE get_event(user_id int, event_date DATE)
+CREATE PROCEDURE get_event(user_id int, event_date DATE, event_name varchar(255))
 BEGIN
-	SELECT event_id, event_name, start_time, end_time, instance_type, routine_frequency
+	SELECT event_id, start_time, end_time, instance_type, routine_frequency
     FROM schedule_events
-    WHERE schedule_events.user_id = user_id AND schedule_events.event_date = event_date;
+    WHERE schedule_events.user_id = user_id AND schedule_events.event_date = event_date AND schedule_events.event_name = event_name;
 END//
 
 -- Missed Events
