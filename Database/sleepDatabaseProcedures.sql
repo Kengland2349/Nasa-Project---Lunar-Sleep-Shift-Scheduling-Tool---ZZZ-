@@ -144,13 +144,13 @@ END//
 
 -- Pre-Sleep Behaviors
 
-CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_mg SMALLINT, caffeine_time TIME, melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
+CREATE PROCEDURE new_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_mg SMALLINT, caffeine_time TIME, melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size INT, exercise_mins SMALLINT, exercise_intensity TINYINT)
 BEGIN
 	INSERT INTO pre_sleep_behaviors(log_id, fatigue_score, alertness_score, caffeine_mg, caffeine_time, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity)
     VALUES(log_id, fatigue_score, alertness_score, caffeine_mg, caffeine_time, melatonin_mg, last_meal_hrs, last_meal_size, exercise_mins, exercise_intensity);
 END//
 
-CREATE PROCEDURE update_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_time TIME, caffeine_mg DECIMAL(5,2), melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size TINYINT, exercise_mins SMALLINT, exercise_intensity TINYINT)
+CREATE PROCEDURE update_pre_sleep_behavior(log_id INT, fatigue_score TINYINT, alertness_score TINYINT, caffeine_time TIME, caffeine_mg DECIMAL(5,2), melatonin_mg DECIMAL(4,2), last_meal_hrs DECIMAL(4,1), last_meal_size INT, exercise_mins SMALLINT, exercise_intensity TINYINT)
 BEGIN
 	UPDATE pre_sleep_behaviors
     SET pre_sleep_behaviors.fatigue_score = fatigue_score, pre_sleep_behaviors.alertness_score = alertness_score, pre_sleep_behaviors.caffeine_time = caffeine_time, pre_sleep_behaviors.caffeine_mg = caffeine_mg, pre_sleep_behaviors.melatonin_mg = melatonin_mg, pre_sleep_behaviors.last_meal_hrs = last_meal_hrs, pre_sleep_behaviors.last_meal_size = last_meal_size, pre_sleep_behaviors.exercise_mins = exercise_mins, pre_sleep_behaviors.exercise_intensity = exercise_intensity
@@ -166,22 +166,22 @@ END//
 
 -- Biometric Profiles
 
-CREATE PROCEDURE new_biometric_profiles(user_id INT, age TINYINT, gender ENUM('Male', 'Female'), height_cm DECIMAL(5,2), weight_kg DECIMAL(5,2))
+CREATE PROCEDURE new_biometric_profiles(user_id INT, age TINYINT, gender ENUM('Male', 'Female'), height_in DECIMAL(5,2), weight_lbs DECIMAL(5,2))
 BEGIN
-	INSERT INTO biometric_profiles(user_id, age, gender, height_cm, weight_kg)
-    VALUES(user_id, age, gender, height_cm, weight_kg);
+	INSERT INTO biometric_profiles(user_id, age, gender, height_in, weight_lbs)
+    VALUES(user_id, age, gender, height_in, weight_lbs);
 END//
 
-CREATE PROCEDURE update_biometric_profiles(profile_id INT, age TINYINT, gender ENUM('Male', 'Female'), height_cm DECIMAL(5,2), weight_kg DECIMAL(5,2))
+CREATE PROCEDURE update_biometric_profiles(profile_id INT, age TINYINT, gender ENUM('Male', 'Female'), height_in DECIMAL(5,2), weight_lbs DECIMAL(5,2))
 BEGIN
 	UPDATE biometric_profiles
-    SET biometric_profiles.age = age, biometric_profiles.gender = gender, biometric_profiles.height_cm = height_cm, biometric_profiles.weight_kg = weight_kg
+    SET biometric_profiles.age = age, biometric_profiles.gender = gender, biometric_profiles.height_in = height_in, biometric_profiles.weight_lbs = weight_lbs
     WHERE biometric_profiles.profile_id = profile_id;
 END//
 
 CREATE PROCEDURE get_biometric_profiles(profile_id INT)
 BEGIN
-	SELECT profile_id, age, gender, height_cm, weight_kg
+	SELECT profile_id, age, gender, height_in, weight_lbs
     FROM biometric_profiles
     WHERE biometric_profiles.profile_id = profile_id;
 END//

@@ -29,7 +29,7 @@ CREATE INDEX idx_user_user_name ON users(user_name);
 CREATE TABLE daily_sleep_logs ( 
 log_id INT AUTO_INCREMENT PRIMARY KEY, 
 user_id INT NOT NULL, 
-log_date DATE NOT NULL UNIQUE,
+log_date DATE NOT NULL,
 bed_time TIME NOT NULL, 
 wake_time TIME NOT NULL,
 latency_mins SMALLINT DEFAULT 0, 
@@ -68,8 +68,8 @@ user_id INT NOT NULL UNIQUE,
 
 age TINYINT NOT NULL CHECK (age BETWEEN 10 AND 120), 
 gender ENUM('Male', 'Female') NOT NULL, 
-height_cm DECIMAL(5,2) NOT NULL,
-weight_kg DECIMAL(5,2) NOT NULL, 
+height_in DECIMAL(5,2) NOT NULL,
+weight_lbs DECIMAL(5,2) NOT NULL, 
 
 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
