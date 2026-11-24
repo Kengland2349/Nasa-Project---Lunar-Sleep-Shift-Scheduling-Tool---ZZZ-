@@ -10,16 +10,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $weight_lbs = filter_input(INPUT_POST, 'weight_lbs', FILTER_VALIDATE_INT);
         $age = filter_input(INPUT_POST, 'age', FILTER_VALIDATE_INT);
         
-        if ($height_inches === false || $height_inches === null || $height_inches < 0) {
-            $height_inches_Error = "Enter a integer zero or greater!";
+        if ($height_inches === false || $height_inches === null || $height_inches < 36  || $height_inches > 144) {
+            $height_inches_Error = "Enter a integer between 36-144!";
             $submit = false;
         }
-        if ($weight_lbs === false || $weight_lbs === null || $weight_lbs < 0) {
-            $weight_lbs_Error = "Enter a integer zero or greater!";
+        if ($weight_lbs === false || $weight_lbs === null || $weight_lbs < 50  || $weight_lbs > 1000) {
+            $weight_lbs_Error = "Enter a integer between 50-1000!";
             $submit = false;
         }
-        if ($age === false || $age === null || $age < 0) {
-            $age_Error = "Enter a integer zero or greater!";
+        if ($age === false || $age === null || $age < 10 || $age > 120) {
+            $age_Error = "Enter a integer between 10-120!";
             $submit = false;
         }
         
@@ -32,8 +32,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $height_inches = $_POST['height_inches'] ?? '';
             $weight_lbs = $_POST['weight_lbs'] ?? '';
             $age = $_POST['age'] ?? '';
+            $userID = $_SESSION['user_ID'];
             
-            //TODO: add the ability to sumbit data to the database
+            $stmt = $pdo->prepare(
+                "CALL new_biometric_profiles(?, ?, ?, ?, ?);"
+                );
+            $stmt->execute([$userID, $age, $gender, $height_inches, $weight_lbs]);
+            $stmt->closeCursor();
+            
             
             unset($_SESSION['page']);
             refresh();

@@ -85,35 +85,35 @@
         
         <div class="star-box">
         <div class="star-rating">
-        	<input type="radio" name="rating" value="10" id="star10">
-            <label for="star10">★</label>
+        	<input type="radio" name="rating" value="10" id="rating10">
+            <label for="rating10">★</label>
     
-            <input type="radio" name="rating" value="9" id="star9">
-            <label for="star9">★</label>
+            <input type="radio" name="rating" value="9" id="rating9">
+            <label for="rating9">★</label>
     
-            <input type="radio" name="rating" value="8" id="star8">
-            <label for="star8">★</label>
+            <input type="radio" name="rating" value="8" id="rating8">
+            <label for="rating8">★</label>
     
-            <input type="radio" name="rating" value="7" id="star7">
-            <label for="star7">★</label>
+            <input type="radio" name="rating" value="7" id="rating7">
+            <label for="rating7">★</label>
     
-            <input type="radio" name="rating" value="6" id="star6">
-            <label for="star6">★</label>
+            <input type="radio" name="rating" value="6" id="rating6">
+            <label for="rating6">★</label>
             
-            <input type="radio" name="rating" value="5" id="star5">
-            <label for="star5">★</label>
+            <input type="radio" name="rating" value="5" id="rating5">
+            <label for="rating5">★</label>
     
-            <input type="radio" name="rating" value="4" id="star4">
-            <label for="star4">★</label>
+            <input type="radio" name="rating" value="4" id="rating4">
+            <label for="rating4">★</label>
     
-            <input type="radio" name="rating" value="3" id="star3">
-            <label for="star3">★</label>
+            <input type="radio" name="rating" value="3" id="rating3">
+            <label for="rating3">★</label>
     
-            <input type="radio" name="rating" value="2" id="star2">
-            <label for="star2">★</label>
+            <input type="radio" name="rating" value="2" id="rating2">
+            <label for="rating2">★</label>
     
-            <input type="radio" name="rating" value="1" id="star1">
-            <label for="star1">★</label>
+            <input type="radio" name="rating" value="1" id="rating1">
+            <label for="rating1">★</label>
         </div>
         </div>
     </div>
